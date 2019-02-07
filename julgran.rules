@@ -1,0 +1,39 @@
+var Timer blinkit = null
+
+rule "Water Christmas tree"
+when 
+    Item In_FamilyRoom_ChristmasTree_HasWater changed from CLOSED to OPEN
+    or
+    Item In_FamilyRoom_ChristmasTree_BlinkWait received command OFF
+    or
+    Item Vtl_Schedule_TimeOfDay_Current changed
+    or 
+    Item Vtl_Presence_FamilyMemberVtl_Presence_FamilyMember_Present changed
+then
+    if ((Vtl_System_Smarthome_Enable.state == ON) && (Vtl_Presence_FamilyMemberVtl_Presence_FamilyMember_Present.state == ON) && (In_FamilyRoom_ChristmasTree_HasWater.state == OPEN) && (Vtl_Schedule_TimeOfDay_Current.state != "NATT")){
+        logInfo("christmastree", "The christmas tree needs water")
+
+        if (In_FamilyRoom_ChristmasTree_Lighting.state == ON) {
+            In_FamilyRoom_ChristmasTree_Lighting.sendCommand(OFF)
+            blinkit = createTimer(now.plusSeconds(4))[|
+                In_FamilyRoom_ChristmasTree_Lighting.sendCommand(ON)
+                In_FamilyRoom_ChristmasTree_BlinkWait.sendCommand(ON)
+            ] 
+        } else if (In_FamilyRoom_ChristmasTree_Lighting.state == OFF) {
+            In_FamilyRoom_ChristmasTree_Lighting.sendCommand(ON)
+            blinkit = createTimer(now.plusSeconds(4))[|
+                In_FamilyRoom_ChristmasTree_Lighting.sendCommand(OFF)
+                In_FamilyRoom_ChristmasTree_BlinkWait.sendCommand(ON)
+            ] 
+        }
+    }
+end
+
+
+rule "The Christmas tree has been watered"
+when 
+    Item In_FamilyRoom_ChristmasTree_HasWater changed from OPEN to CLOSED
+then
+    logInfo("christmastree", "The christmas tree was watered")
+    In_FamilyRoom_ChristmasTree_BlinkWait.postUpdate(OFF)
+end

@@ -1,0 +1,6 @@
+
+
+Contact In_FamilyRoom_ChristmasTree_HasWater "Christmas tree has water or not" (Vtl_Openhab_HistoryPersistance_Group) {mqtt="<[mosquitto:/home/christmastree/water:state:OPEN:LOW],<[mosquitto:/home/christmastree/water:state:CLOSED:OK]"}
+Switch  In_FamilyRoom_ChristmasTree_BlinkWait "Wait Christmas tree blink"  {expire="2m,command=OFF"}
+
+
